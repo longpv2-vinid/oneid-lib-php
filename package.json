@@ -1,0 +1,16 @@
+{
+  "name": "vinid/lib-payment-integration",
+  "type": "library",
+  "description": "Library support communicate with VinID payment platform",
+  "keywords": ["vinid","payment","php"],
+  "homepage": "https://developers.vinid.net",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pham Viet Long",
+      "email": "v.longpv2@vinid.net",
+      "homepage": "https://vinid.net",
+      "role": "Developer"
+    }
+  ]
+}
