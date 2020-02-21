@@ -51,6 +51,7 @@ class TransactionQR {
             'X-Key-Code: '.$apiKey,
             'X-Nonce: '.$nonce,
             'X-Timestamp: '.$timestamp,
+            'X-Signature: '.$sign,
         ];
 
         $ch = curl_init();
