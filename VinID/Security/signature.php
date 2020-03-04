@@ -1,12 +1,12 @@
 <?php
 
-namespace VinID\Security;
+namespace VinID;
 
 class Signature {
     public static function generate($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey)
     {
         $data = $url.";".$method.";".$nonce.";".$timestamp.";".$apiKey.";".$requestBody;
-        print_r($data . PHP_EOL);
+//        print_r($data . PHP_EOL);
         try {
             $p = openssl_pkey_get_private($privateKey);
             $signSuccess = openssl_sign($data, $signature, $p, OPENSSL_ALGO_SHA256);

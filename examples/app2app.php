@@ -33,9 +33,14 @@ NDYYB1O4E5bCJHazBSz5jsc/UyxbTwax1vVGr2aXIgsbLVAoQoZzznM=
 -----END RSA PRIVATE KEY-----
 EOD;
 
-$transtionQR = new \VinID\TransactionQR();
+$appClient = new \VinID\App2App();
 
 \VinID\VinID::setApiKey($apiCode);
 \VinID\VinID::setPrivateKey($private_key);
 
-$transtionQR->generateQR('SBLONGPV2', 'SBLONGPV2', 10000, 'Test trans QR');
+$order = $appClient->createTransactionOrder('SBLONGPV2', 'SBLONGPV2','Oh Yeah', 10000, 'Test App 2 App');
+echo $order->getOrderID() . PHP_EOL;
+// Since this example use time() as Nonce, we should wait some seconds before continue request to server.
+sleep(5);
+$result = $appClient->queryOrderStatus($order->getOrderID());
+echo $result;
