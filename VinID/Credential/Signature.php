@@ -1,12 +1,12 @@
 <?php
 
-namespace VinID;
+namespace Credential;
 
-class Signature {
+class Signature
+{
     public static function generate($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey)
     {
-        $data = $url.";".$method.";".$nonce.";".$timestamp.";".$apiKey.";".$requestBody;
-//        print_r($data . PHP_EOL);
+        $data = $url . ";" . $method . ";" . $nonce . ";" . $timestamp . ";" . $apiKey . ";" . $requestBody;
         try {
             $p = openssl_pkey_get_private($privateKey);
             $signSuccess = openssl_sign($data, $signature, $p, OPENSSL_ALGO_SHA256);
@@ -15,7 +15,6 @@ class Signature {
                 return "";
             }
             $encodedSignature = base64_encode($signature);
-            print($encodedSignature.PHP_EOL);
             openssl_free_key($p);
             return $encodedSignature;
         } catch (Exception $e) {
