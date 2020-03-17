@@ -1,5 +1,7 @@
 <?php
 
+use VinID\App2App;
+
 require '../init.php';
 
 $apiCode = 'YOUR-API-KEY-HERE';
@@ -11,7 +13,7 @@ EOD;
 
 
 $isUsingProductionEnv = false;
-$client = new \VinID\App2App($isUsingProductionEnv);
+$client = new App2App($isUsingProductionEnv);
 
 // set required values
 $client->setApiKey($apiCode);

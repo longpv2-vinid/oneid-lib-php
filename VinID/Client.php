@@ -1,9 +1,11 @@
 <?php
 
-
 namespace VinID;
 
 use Credential\Signature;
+use Exception;
+use stdClass;
+
 const SANDBOX_URL = 'https://api-merchant-sandbox.vinid.dev';
 const PRODUCTION_URL = 'https://api-merchant.vinid.net';
 const ENDPOINT_TRANSACTION_QR = '/merchant-integration/v1/qr/gen-transaction-qr';
@@ -12,7 +14,7 @@ const ENDPOINT_QUERY_ORDER_STATUS = '/merchant-integration/v1/qr/query/';
 
 abstract class Client
 {
-    public $isProductionEnviroment = false;
+    public $isProductionEnvironment = false;
     protected $executeHost;
 
     protected $apiKey;
@@ -76,7 +78,7 @@ abstract class Client
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('[VinID] ExtraData should be in JSON format!');
         }
-        $this->extraData = new \stdClass();
+        $this->extraData = new stdClass();
         $this->extraData->partner_code = $partnerCode;
         $this->extraData->order_info = $extraData;
         return $this;
@@ -150,7 +152,7 @@ abstract class Client
 
     public function getApiKey()
     {
-        return self::$apiKey;
+        return $this->apiKey;
     }
 
     public function setApiKey($apiKey)
@@ -161,7 +163,7 @@ abstract class Client
 
     public function getPrivateKey()
     {
-        return self::$privateKey;
+        return $this->privateKey;
     }
 
     public function setPrivateKey($privateKey)
@@ -177,7 +179,7 @@ abstract class Client
         } else {
             $this->executeHost = SANDBOX_URL;
         }
-        $this->isProductionEnviroment = $isProduction;
+        $this->isProductionEnvironment = $isProduction;
     }
 
 //    abstract function generateTransactionQR();

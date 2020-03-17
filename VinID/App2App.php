@@ -2,8 +2,6 @@
 
 namespace VinID;
 
-use App2App\Order;
-
 class App2App extends Client
 {
     public function __construct($isProduction = false)

@@ -2,6 +2,8 @@
 
 namespace Credential;
 
+use Exception;
+
 class Signature
 {
     public static function generate($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey)
@@ -20,5 +22,6 @@ class Signature
         } catch (Exception $e) {
             print_r($e->getMessage());
         }
+        return "";
     }
 }

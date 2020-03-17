@@ -1,5 +1,7 @@
 <?php
 
+use VinID\TransactionQR;
+
 require '../init.php';
 
 $apiCode = 'YOUR-API-KEY';
@@ -10,7 +12,7 @@ YOUR PRIVATE KEY HERE
 EOD;
 
 $isUsingProductionEnv = false;
-$client = new \VinID\TransactionQR($isUsingProductionEnv);
+$client = new TransactionQR($isUsingProductionEnv);
 
 // set required values
 $client->setApiKey($apiCode);
