@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/VinID/Client.php';
-require __DIR__ . '/VinID/Credential/Signature.php';
-require __DIR__ . '/VinID/TransactionQR.php';
-require __DIR__ . '/VinID/App2App.php';
+require __DIR__ . '/src/Client.php';
+require __DIR__ . '/src/Credential/Signature.php';
+require __DIR__ . '/src/TransactionQR.php';
+require __DIR__ . '/src/App2App.php';
