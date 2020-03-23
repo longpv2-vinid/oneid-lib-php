@@ -15,6 +15,7 @@ function oneid_autoloader($class)
         return false;
     }
     $class = substr($class, strlen(_CLASS_PREFIX));
+    $class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
     include_once __DIR__ . DIRECTORY_SEPARATOR . $class . ".php";
     return true;
 }

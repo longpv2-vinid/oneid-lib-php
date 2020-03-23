@@ -37,7 +37,7 @@ class UtilitiesTest extends TestCase
      */
     public function testGenerateSignature_Succeed($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey, $expected)
     {
-        $signature = Utilities::GenerateSignature($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey);
+        $signature = Utilities::generateSignature($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $privateKey);
         $this->assertEquals($expected, $signature);
     }
 
@@ -50,6 +50,6 @@ class UtilitiesTest extends TestCase
         $charPosToRemove = random_int(0, strlen($privateKey));
         $wrongPrivateKey = substr($privateKey, 0, $charPosToRemove) . substr($privateKey, $charPosToRemove+1);
         $this->expectException("OneId\InvalidPrivateKeyException");
-        $signature = Utilities::GenerateSignature($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $wrongPrivateKey);
+        $signature = Utilities::generateSignature($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $wrongPrivateKey);
     }
 }
