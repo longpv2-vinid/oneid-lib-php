@@ -34,6 +34,7 @@ class Utilities
         $data = $url . ";" . $method . ";" . $nonce . ";" . $timestamp . ";" . $apiKey . ";" . $requestBody;
         $p = openssl_pkey_get_private($privateKey);
         if (!$p) {
+            trigger_error("Invalid private key\n".$privateKey, E_USER_WARNING);
             throw new InvalidPrivateKeyException($privateKey);
         }
         $signSuccess = openssl_sign($data, $signature, $p, OPENSSL_ALGO_SHA256);

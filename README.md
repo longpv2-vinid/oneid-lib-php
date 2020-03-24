@@ -16,3 +16,12 @@ Hoặc, chạy lệnh composer:
 # Sử dụng
 
 ## Transaction QR
+
+```php
+use OneId;
+
+$o = new Order(....);
+
+$qrImage = $o->getQRImage();
+
+```

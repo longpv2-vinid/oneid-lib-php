@@ -3,6 +3,7 @@
 use OneId\Utilities;
 
 use PHPUnit\Framework\TestCase;
+use const OneId\TEST_PRIVATE_KEY;
 
 class UtilitiesTest extends TestCase
 {
@@ -17,7 +18,7 @@ class UtilitiesTest extends TestCase
                 "123456789@123abc",
                 '{"a":2,"b":1}',
                 TEST_PRIVATE_KEY,
-                "XJNR40m9ReovfuIt+PU/mmRUnS6q4VYiqBrgovTjkQ17uINLeRD1pjoaNOaWfhhC/tv4iYtptLvLLg/WsVdreZ3l0ViOlgJIpzVRrTINGqE3PIh92Sj2i7Gm3yQQ3qG/iys+TRWHeQX8wukH/zmOPlWpoTLH4pK5f4uBM53A4GxZZOvll4hkAqxyEJ98VLzxDZnheAg/uI+Xu3rYg1tSVE7U0NxXvnB02tPJRf7cUvHDTZWay2LlMDL6Ff5iumLlHSY6V15pHJxS9dGhd5iW2KGLCROgX0ztLcQebGUA8s5GaKDTNnMdUycJKMfT4vfUKjzn08GWLPUlHEk/OrPIAQ=="
+                "VR8hbfpXbrC7xmRytlC1sjiAvp2fvwDKAxgVynmobB14vrHD9ONnhjGqXLd1zF7vzD7WltgklQ0hfEyhB4jxW/G0zwBQMqvlHsWBU4cBwugMg84D5kA025op+nqlLYWR4Y5Pw/cLJtE614EGRpsH8MIeXBOXR9qb5tt7xrWAWqrAM0hIxM9flWF4D0s0jdZqN6ksuTlMgiNhDPXaeZb0lJRklDmf2N4+V9m0UnNUdlzwA76iG9YHjLSbhVrFnJLmYLVkXWn+rU99LeiX/rLnhVpWJqkbrTPT8qto8RMSAvOf2tKnP0/q5T/3+Izrcqpqq2ZhjQv2ecmDML1pTS7ZOw=="
             ],
             'succeed 02' => [
                 "https://a.b",
@@ -27,7 +28,7 @@ class UtilitiesTest extends TestCase
                 "123456789@123abd",
                 '{"a":2,"b":1}',
                 TEST_PRIVATE_KEY,
-                "VZryPIDqGRPPBX0EoCy7C/bu7UmAc/i2csMcdj+lzFxS76xYVZjtI+4E9h/rkCXTkTw2YMkplHx3eZIplqbXE7qT+jpbLxt3SBCWoCmE2KJeyPEEo9eaYc05YsvlZrhn6rEbVXit//xE467txLLO+SO8jGR792Ym5oZktV0aQdThq+Nj8xfidO9FjDXKeC03xLAwrZbUMd0UEvDWIiFRoblLKjsrFNfbL5gLd4xp4nwdRcuzLZY26WA18SSjAPaV55zmgbEQPAD90V6X852WwGbcCHgtSbRB1clHAc0FxzPDf0ptQ4s8JNeIkwKCx09pYdxROzVEQg3aJt89KKmONQ=="
+                "vvoTTd2Xmu65l8CQ6O81Scnjl/bVPU/VwGP7PqmYbIKRABeUC47s3tf8fRRAmQB+IjiWkZ+CHpX2jVSVpMB81DJBfe03/jUC1gHUAsCuE73+nPpsNesOIBrtcirFwRza0x946lHIePw8AQmiVkn/LlPyI+TeeI+WonOukI4kY3aWWVj3tZVraRDTYfi8Hn18ocZKdib34Icuw8rw+aPBSflUR2qMN4EDUnwLW5/ktXegxV7FbfBoCMKqizRwGopzQXMx/hLCc+FWFSoNFzsnIjOYBdIf/w25Essmb/LRTz5elzysnmftlJ+C6Em35EMz9mQopIi5gNrfmb6+Q0+qmw=="
             ],
         ];
     }
@@ -50,6 +51,7 @@ class UtilitiesTest extends TestCase
         $charPosToRemove = random_int(0, strlen($privateKey));
         $wrongPrivateKey = substr($privateKey, 0, $charPosToRemove) . substr($privateKey, $charPosToRemove+1);
         $this->expectException("OneId\InvalidPrivateKeyException");
+        $this->expectWarning();
         $signature = Utilities::generateSignature($url, $method, $nonce, $timestamp, $apiKey, $requestBody, $wrongPrivateKey);
     }
 }

@@ -1,205 +1,129 @@
 <?php
 
-namespace VinID;
+namespace OneId;
 
-use Credential\Signature;
-use Exception;
-use stdClass;
+use OneId\NonceManager\iNonceManager;
+use OneId\NonceManager\RandomNonceManager;
 
-const SANDBOX_URL = 'https://api-merchant-sandbox.vinid.dev';
-const PRODUCTION_URL = 'https://api-merchant.vinid.net';
-const ENDPOINT_TRANSACTION_QR = '/merchant-integration/v1/qr/gen-transaction-qr';
-const ENDPOINT_CREATE_ORDER = '/merchant-integration/v1/qr/create-transaction-order';
-const ENDPOINT_QUERY_ORDER_STATUS = '/merchant-integration/v1/qr/query/';
-
-abstract class Client
+class Client
 {
-    public $isProductionEnvironment = false;
-    protected $executeHost;
+    private $baseUrl;
 
-    protected $apiKey;
-    protected $privateKey;
+    private $apiKey;
+    private $privateKey;
+    private $nonceManager;
 
-    protected $callbackURL;
-    protected $description;
-    protected $extraData;
-    protected $amount;
-    protected $currency = 'VND';
-    protected $orderReferenceId;
-    protected $posCode;
-    protected $serviceType = 'PURCHASE';
-    protected $storeCode;
-    protected $userId;
-
-    public function getUserId()
+    public function __construct($nonceManager=null, $apiKey=null, $privateKey=null, $baseUrl=null)
     {
-        return $this->userId;
-    }
-
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-        return $this;
-    }
-
-    public function getServiceType()
-    {
-        return $this->serviceType;
-    }
-
-    public function setServiceType($serviceType)
-    {
-        $this->serviceType = $serviceType;
-        return $this;
-    }
-
-    public function getCallbackURL()
-    {
-        return $this->callbackURL;
-    }
-
-    public function setCallbackURL($callbackURL)
-    {
-        $this->callbackURL = $callbackURL;
-        return $this;
-    }
-
-    public function getExtraData()
-    {
-        return $this->extraData;
-    }
-
-    public function setExtraData($partnerCode, $extraData)
-    {
-        if (strlen($partnerCode) == 0) {
-            throw new Exception('[VinID] Merchant Code cannot be null!');
-        }
-        json_decode($extraData);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('[VinID] ExtraData should be in JSON format!');
-        }
-        $this->extraData = new stdClass();
-        $this->extraData->partner_code = $partnerCode;
-        $this->extraData->order_info = $extraData;
-        return $this;
-    }
-
-    public function getCurrency()
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency($currency)
-    {
-        $this->currency = $currency;
-        return $this;
-    }
-
-    public function getOrderReferenceId()
-    {
-        return $this->orderReferenceId;
-    }
-
-    public function setOrderReferenceId($orderReferenceId)
-    {
-        $this->orderReferenceId = $orderReferenceId;
-        return $this;
-    }
-
-    public function getStoreCode()
-    {
-        return $this->storeCode;
-    }
-
-    public function setStoreCode($storeCode)
-    {
-        $this->storeCode = $storeCode;
-        return $this;
-    }
-
-    public function getPosCode()
-    {
-        return $this->posCode;
-    }
-
-    public function setPosCode($posCode)
-    {
-        $this->posCode = $posCode;
-        return $this;
-    }
-
-    public function getAmount()
-    {
-        return $this->amount;
-    }
-
-    public function setAmount($amount)
-    {
-        $this->amount = $amount;
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-        return $this;
+        $this->setNonceManager($nonceManager);
+        $this->setApiKey($apiKey);
+        $this->setPrivateKey($privateKey);
+        $this->setBaseUrl($baseUrl);
     }
 
     public function getApiKey()
     {
+        if (is_null($this->apiKey)) {
+            $this->apiKey = Utilities::readValueFromEnv("ONEID_API_KEY");
+        }
         return $this->apiKey;
     }
 
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
-        return $this;
     }
 
     public function getPrivateKey()
     {
+        if (is_null($this->privateKey)) {
+            $this->privateKey = Utilities::readValueFromEnv("ONEID_PRIVATE_KEY");
+        }
         return $this->privateKey;
+    }
+
+    public function setNonceManager($manager)
+    {
+        if (is_null($manager)) return;
+        if (!($manager instanceof iNonceManager)) {
+            trigger_error(sprintf("%s is not instance of %s\iNonceManager", $manager, __NAMESPACE__), E_USER_ERROR);
+            return;
+        }
+        $this->nonceManager = $manager;
+    }
+
+    /**
+     * @return iNonceManager
+     */
+    public function getNonceManager()
+    {
+        if (is_null($this->nonceManager)) {
+            $this->nonceManager = new RandomNonceManager();
+        }
+        return $this->nonceManager;
     }
 
     public function setPrivateKey($privateKey)
     {
         $this->privateKey = $privateKey;
-        return $this;
     }
 
-    public function __construct($isProduction = false)
+    public function getBaseUrl()
     {
-        if ($isProduction) {
-            $this->executeHost = PRODUCTION_URL;
-        } else {
-            $this->executeHost = SANDBOX_URL;
+        if (is_null($this->baseUrl)) {
+            $baseUrl = Utilities::readValueFromEnv("ONEID_API_BASEURL");
+            if (is_null($baseUrl)) {
+                $oneIdEnv = strtolower(Utilities::readValueFromEnv("ONEID_ENV", "sandbox"));
+                if ($oneIdEnv == "prod" || $oneIdEnv == "production") {
+                    $baseUrl = API_BASEURL_PRODUCTION;
+                } else {
+                    $baseUrl = API_BASEURL_SANDBOX;
+                }
+            }
+            $this->baseUrl = $baseUrl;
         }
-        $this->isProductionEnvironment = $isProduction;
+        return $this->baseUrl;
     }
 
-//    abstract function generateTransactionQR();
-//    abstract function createTransactionOrder();
-//    abstract function queryOrderStatus($orderId);
-
-    protected function doRequest($apiKey, $method, $nonce, $timestamp, $url, $body)
+    public function setBaseUrl($baseUrl)
     {
-        $sign = Signature::generate($url, $method, $nonce, $timestamp, $this->apiKey, $body, $this->privateKey);
+        $this->baseUrl = $baseUrl;
+    }
+
+    public function getApiEndPoint($apiPath)
+    {
+        return $this->getBaseUrl().$apiPath;
+    }
+
+    /**
+     * Make request to OneID's APIs
+     *
+     * @param string $method
+     * @param string $url
+     * @param mixed $body
+     * @param string|null $nonce
+     * @param string|null $timestamp
+     * @return bool|string
+     * @throws InvalidPrivateKeyException
+     */
+    function doRequest($method, $url, $body, $nonce=null, $timestamp=null)
+    {
+        if (is_null($nonce)) $nonce = $this->getNonceManager()->generateNonce();
+        if (is_null($timestamp)) $timestamp = time();
+        $apiKey = $this->getApiKey();
+        $body = json_encode($body);
+        $signature = Utilities::generateSignature($url, $method, $nonce, $timestamp, $apiKey, $body, $this->getPrivateKey());
         $headers = [
             'Accept: application/json',
             'Content-Type: application/json',
             'X-Key-Code: ' . $apiKey,
             'X-Nonce: ' . $nonce,
             'X-Timestamp: ' . $timestamp,
-            'X-Signature: ' . $sign,
+            'X-Signature: ' . $signature,
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->executeHost . $url);
+        curl_setopt($ch, CURLOPT_URL, $this->getApiEndPoint($url));
         if ($method == 'POST') {
             curl_setopt($ch, CURLOPT_POST, 1);
         } else {
@@ -207,14 +131,26 @@ abstract class Client
         }
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $result = curl_exec($ch);
+        if ($result === false) {
+            trigger_error(curl_error($ch), E_USER_WARNING);
+        }
         curl_close($ch);
 
         return $result;
     }
+
+    /**
+     * @return Client
+     */
+    static function defaultClient()
+    {
+        global $defaultClient;
+        return $defaultClient;
+    }
 }
+
+$defaultClient = new Client();
