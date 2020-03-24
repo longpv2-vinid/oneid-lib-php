@@ -1,6 +1,6 @@
 <?php
 
-namespace OneId;
+namespace OneId\Api;
 
 use OneId\NonceManager\iNonceManager;
 use OneId\NonceManager\RandomNonceManager;
