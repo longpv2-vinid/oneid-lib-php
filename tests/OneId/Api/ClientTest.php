@@ -6,6 +6,7 @@ use OneId\Api\NonceManager\RandomNonceManager;
 use OneId\Utilities;
 use PHPUnit\Framework\TestCase;
 use const OneId\API_BASEURL_SANDBOX;
+use const OneId\API_ENDPOINT_TRANSACTION_QR;
 use const OneId\TEST_API_KEY;
 use const OneId\TEST_PRIVATE_KEY;
 

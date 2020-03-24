@@ -146,6 +146,7 @@ class Client
         } else {
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         }
+        curl_setopt($curl, CURLOPT_HEADER, true); // we want to get response headers
         curl_setopt($curl, CURLOPT_HTTPHEADER, $req->getHeadersForCURL());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $req->getEncodedBody());
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
@@ -153,14 +154,20 @@ class Client
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        $result = curl_exec($curl);
-        if ($result === false) {
+        $responseText = curl_exec($curl);
+
+        if ($responseText === false) {
             trigger_error(curl_error($curl), E_USER_WARNING);
             return null;
         }
+
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+
+        $resHeaders = substr($curl, 0, $headerSize);
+        $resBody = substr($responseText, $headerSize);
         curl_close($curl);
 
-        return $result;
+        return new Response($resBody, $resHeaders);
     }
 
     /**
