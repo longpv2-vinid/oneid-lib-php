@@ -2,6 +2,7 @@
 
 namespace OneId\Api;
 
+use OneId\Utilities;
 use OneId\NonceManager\iNonceManager;
 use OneId\NonceManager\RandomNonceManager;
 
@@ -96,6 +97,33 @@ class Client
     }
 
     /**
+     * Prepare for a curl handle for an API request
+     * @param $method
+     * @param $url
+     * @param $body
+     * @param null $nonce
+     * @param null $timestamp
+     * @return Request
+     * @throws \OneId\InvalidPrivateKeyException
+     */
+    public function prepareRequest($method, $url, $body, $nonce=null, $timestamp=null)
+    {
+        $req = new Request();
+        if (is_null($nonce)) $nonce = $this->getNonceManager()->generateNonce();
+        if (is_null($timestamp)) $timestamp = time();
+
+        $req->method = $method;
+        $req->apiPath = $url;
+        $req->body = $body;
+        $req->nonce = $nonce;
+        $req->timestamp = $timestamp;
+        $req->apiKey = $this->getApiKey();
+        $req->populateSignature($this->getPrivateKey());
+
+        return $req;
+    }
+
+    /**
      * Make request to OneID's APIs
      *
      * @param string $method
@@ -104,41 +132,31 @@ class Client
      * @param string|null $nonce
      * @param string|null $timestamp
      * @return bool|string
-     * @throws InvalidPrivateKeyException
+     * @throws \OneId\InvalidPrivateKeyException
      */
-    function doRequest($method, $url, $body, $nonce=null, $timestamp=null)
+    public function request($method, $url, $body, $nonce=null, $timestamp=null)
     {
-        if (is_null($nonce)) $nonce = $this->getNonceManager()->generateNonce();
-        if (is_null($timestamp)) $timestamp = time();
-        $apiKey = $this->getApiKey();
-        $body = json_encode($body);
-        $signature = Utilities::generateSignature($url, $method, $nonce, $timestamp, $apiKey, $body, $this->getPrivateKey());
-        $headers = [
-            'Accept: application/json',
-            'Content-Type: application/json',
-            'X-Key-Code: ' . $apiKey,
-            'X-Nonce: ' . $nonce,
-            'X-Timestamp: ' . $timestamp,
-            'X-Signature: ' . $signature,
-        ];
+        $req = $this->prepareRequest($method, $url, $body, $nonce, $timestamp);
+        $curl = curl_init($this->getApiEndPoint($url));
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->getApiEndPoint($url));
+//        curl_setopt($ch, CURLOPT_URL, $this->getApiEndPoint($url));
         if ($method == 'POST') {
-            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POST, 1);
         } else {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         }
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $req->getHeadersForCURL());
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $req->getEncodedBody());
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        $result = curl_exec($ch);
+        $result = curl_exec($curl);
         if ($result === false) {
-            trigger_error(curl_error($ch), E_USER_WARNING);
+            trigger_error(curl_error($curl), E_USER_WARNING);
         }
-        curl_close($ch);
+        curl_close($curl);
 
         return $result;
     }

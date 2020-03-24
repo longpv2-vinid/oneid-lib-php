@@ -1,7 +1,7 @@
 <?php
 
 namespace OneId;
-use OneId\Client;
+use OneId\Api\Client;
 use OneId\NonceManager\RandomNonceManager;
 use PHPUnit\Framework\TestCase;
 
@@ -87,21 +87,57 @@ class ClientTest extends TestCase
     function dataProvider_doRequest()
     {
         return [
-            array('POST', API_ENDPOINT_TRANSACTION_QR, array(), 200),
+            array(
+                'POST',
+                API_ENDPOINT_TRANSACTION_QR,
+                array("a"=>1234),
+                array(
+                    'headers'=>[
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'X-Key-Code' => null,
+                        'X-Nonce' => null,
+                        'X-Timestamp' => null,
+                        'X-Signature' => null,
+                    ],
+                    "body"=>'{"a":1234}',
+                )),
         ];
     }
 
     /**
      * @dataProvider dataProvider_doRequest
      */
-    public function testDoRequest_Success($method, $url, $body, $expected)
+    public function testPrepareRequest($method, $url, $body, $expected)
     {
         $client = new Client();
         $client->setPrivateKey(TEST_PRIVATE_KEY);
         $client->setApiKey(TEST_API_KEY);
         $client->setBaseUrl(API_BASEURL_SANDBOX);
 
-        $rv = $client->doRequest($method, $url, $body);
-        $this->assertEquals($expected, $rv);
+        $req = $client->prepareRequest($method, $url, $body);
+
+        $expectedHeaders = $expected['headers'];
+        $realHeaders = $req->getHeaders();
+        foreach ($expectedHeaders as $key => $val) {
+            if (is_null($val)) $this->assertArrayHasKey($key, $realHeaders);
+            else $this->assertEquals($val, $realHeaders[$key]);
+        }
+        $this->assertIsInt($realHeaders['X-Timestamp']);
+        $this->assertIsString($realHeaders['X-Key-Code']);
+        $this->assertIsString($realHeaders['X-Signature']);
+
+        $expectedSignature = Utilities::generateSignature(
+            $req->url,
+            $req->method,
+            $req->nonce,
+            $req->timestamp,
+            $req->apiKey,
+            $req->getEncodedBody(),
+            $client->getPrivateKey(),
+        );
+        $this->assertEquals($expectedSignature, $realHeaders['X-Signature']);
+
+        $this->assertEquals($expected['body'], $req->getEncodedBody());
     }
 }
