@@ -2,9 +2,9 @@
 
 namespace OneId\Api;
 
+use OneId\Api\NonceManager\iNonceManager;
+use OneId\Api\NonceManager\RandomNonceManager;
 use OneId\Utilities;
-use OneId\NonceManager\iNonceManager;
-use OneId\NonceManager\RandomNonceManager;
 
 class Client
 {
@@ -133,6 +133,7 @@ class Client
      * @param string|null $timestamp
      * @return bool|string
      * @throws \OneId\InvalidPrivateKeyException
+     * @return Response
      */
     public function request($method, $url, $body, $nonce=null, $timestamp=null)
     {
@@ -155,6 +156,7 @@ class Client
         $result = curl_exec($curl);
         if ($result === false) {
             trigger_error(curl_error($curl), E_USER_WARNING);
+            return null;
         }
         curl_close($curl);
 

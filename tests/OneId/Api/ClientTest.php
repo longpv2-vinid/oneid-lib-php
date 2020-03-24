@@ -1,9 +1,13 @@
 <?php
 
-namespace OneId;
-use OneId\Api\Client;
-use OneId\NonceManager\RandomNonceManager;
+namespace OneId\Api;
+
+use OneId\Api\NonceManager\RandomNonceManager;
+use OneId\Utilities;
 use PHPUnit\Framework\TestCase;
+use const OneId\API_BASEURL_SANDBOX;
+use const OneId\TEST_API_KEY;
+use const OneId\TEST_PRIVATE_KEY;
 
 class ClientTest extends TestCase
 {
@@ -44,8 +48,8 @@ class ClientTest extends TestCase
 
     public function testGetSetNonceManager()
     {
-        $val1 = new NonceManager\RandomNonceManager();
-        $val2 =  new NonceManager\RandomNonceManager();
+        $val1 = new RandomNonceManager();
+        $val2 =  new RandomNonceManager();
         $client = new Client();
 
         $client->setNonceManager($val2);
@@ -107,6 +111,7 @@ class ClientTest extends TestCase
 
     /**
      * @dataProvider dataProvider_doRequest
+     * @throws \OneId\InvalidPrivateKeyException
      */
     public function testPrepareRequest($method, $url, $body, $expected)
     {

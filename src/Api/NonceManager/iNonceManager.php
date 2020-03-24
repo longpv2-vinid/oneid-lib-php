@@ -1,5 +1,5 @@
 <?php
-namespace OneId\NonceManager;
+namespace OneId\Api\NonceManager;
 
 interface iNonceManager
 {
