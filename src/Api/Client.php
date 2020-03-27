@@ -14,7 +14,7 @@ class Client
     private $privateKey;
     private $nonceManager;
 
-    public function __construct($nonceManager=null, $apiKey=null, $privateKey=null, $baseUrl=null)
+    public function __construct($apiKey=null, $privateKey=null, $baseUrl=null, $nonceManager=null)
     {
         $this->setNonceManager($nonceManager);
         $this->setApiKey($apiKey);
@@ -133,7 +133,7 @@ class Client
      * @param string|null $timestamp
      * @return bool|string
      * @throws \OneId\InvalidPrivateKeyException
-     * @return Response
+     * @return \OneId\Api\Response
      */
     public function request($method, $url, $body, $nonce=null, $timestamp=null)
     {
@@ -163,7 +163,7 @@ class Client
 
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 
-        $resHeaders = substr($curl, 0, $headerSize);
+        $resHeaders = substr($responseText, 0, $headerSize);
         $resBody = substr($responseText, $headerSize);
         curl_close($curl);
 

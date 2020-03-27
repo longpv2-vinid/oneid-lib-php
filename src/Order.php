@@ -1,6 +1,8 @@
 <?php
 namespace OneId;
 
+use OneId\Api\Client;
+
 /**
  * This class provide all order's feature with OneId
  *
@@ -96,6 +98,6 @@ class Order
     public function getQRImage()
     {
         $body = $this->buildApiRequestBody_GenTransactionQr();
-        $rv = $this->getClient()->doRequest("GET", API_ENDPOINT_TRANSACTION_QR, $body);
+        $rv = $this->getClient()->request("GET", API_ENDPOINT_TRANSACTION_QR, $body);
     }
 }

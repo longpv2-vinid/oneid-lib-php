@@ -146,4 +146,51 @@ class ClientTest extends TestCase
 
         $this->assertEquals($expected['body'], $req->getEncodedBody());
     }
+
+    public function testRealRequestOnSandbox()
+    {
+        $privateKey = Utilities::readValueFromEnv("TEST_SANDBOX_PRIVATEKEY");
+        if (is_null($privateKey)) {
+            $this->markTestIncomplete("Please set env:TEST_SANDBOX_PRIVATEKEY to run this test");
+        }
+        $privateKey = str_replace("\\n", "\n", $privateKey);
+
+        $apiKey = Utilities::readValueFromEnv("TEST_SANDBOX_APIKEY");
+        if (is_null($apiKey)) {
+            $this->markTestIncomplete("Please set env:TEST_SANDBOX_APIKEY to run this test");
+        }
+
+        $storeCode = Utilities::readValueFromEnv("TEST_SANDBOX_STORECODE");
+        if (is_null($storeCode)) {
+            $this->markTestIncomplete("Please set env:TEST_SANDBOX_STORECODE to run this test");
+        }
+
+        $posCode = Utilities::readValueFromEnv("TEST_SANDBOX_POSCODE");
+        if (is_null($posCode)) {
+            $this->markTestIncomplete("Please set env:TEST_SANDBOX_POSCODE to run this test");
+        }
+
+        $orderRefId = Utilities::generateGUID4();
+        $payload = [
+            'callback_url' => "http://localhost",
+            'description' => "Order from Unittest",
+            'extra_data' => null,
+            'order_amount' => 10000,
+            'order_currency' => "VND",
+            'order_reference_id' => $orderRefId,
+            'pos_code' => $posCode,
+            'service_type' => "PURCHASE",
+            'store_code' => $storeCode
+        ];
+        $client = new Client($apiKey, $privateKey, API_BASEURL_SANDBOX);
+        $res = $client->request(
+            "POST",
+            API_ENDPOINT_TRANSACTION_QR,
+            $payload
+        );
+
+        $this->assertEquals(200, $res->getHttpStatusCode());
+        $this->assertEquals(200, $res->getApiStatusCode());
+        $this->assertEquals("OK", $res->getApiStatusMessage());
+    }
 }
