@@ -36,7 +36,7 @@ class Request
     public function populateSignature($privateKey)
     {
         $this->signature = Utilities::generateSignature(
-            $this->url,
+            $this->apiPath,
             $this->method,
             $this->nonce,
             $this->timestamp,

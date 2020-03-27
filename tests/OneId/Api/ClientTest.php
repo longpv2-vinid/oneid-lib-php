@@ -134,7 +134,7 @@ class ClientTest extends TestCase
         $this->assertIsString($realHeaders['X-Signature']);
 
         $expectedSignature = Utilities::generateSignature(
-            $req->url,
+            $req->apiPath,
             $req->method,
             $req->nonce,
             $req->timestamp,
