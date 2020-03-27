@@ -6,6 +6,12 @@
 # VinID PHP Library
 Thư viện này giúp đối tác kết nối dễ dàng đến hệ thống Payment của VinID.
 
+# Contributions
+## Testing
+```
+./vendor/bin/phpunit tests -v
+```
+
 # Cài đặt
 Để cài đặt,bạn có thể tải bản zip [tại đây](https://vinid.net). 
 
@@ -15,12 +21,14 @@ Hoặc, chạy lệnh composer:
 
 # Sử dụng
 
+...
+
 ## Transaction QR
 
 ```php
 use OneId;
 
-$o = new Order(....);
+$o = new Order();
 
 $qrImage = $o->getQRImage();
 
