@@ -8,7 +8,7 @@ jobs:
   build:
     name: "PHPUnit test"
 
-    runs-on: docker/composer@latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
