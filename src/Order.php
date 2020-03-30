@@ -66,6 +66,18 @@ class Order
     public function getClient()
     {
         if (is_null($this->_client)) $this->_client = Client::defaultClient();
+        return $this->_client;
+    }
+
+    /**
+     * Bind this order into a client. If you do not bind any client, Client::defaultClient()
+     * will be used
+     *
+     * @param Client $client
+     */
+    public function bindClient($client)
+    {
+        $this->_client = $client;
     }
 
     /**
@@ -94,6 +106,7 @@ class Order
      * <img href="data:image/png;base64,{imageData}" />
      *
      * @return string image data
+     * @throws InvalidPrivateKeyException
      */
     public function getQRImage()
     {

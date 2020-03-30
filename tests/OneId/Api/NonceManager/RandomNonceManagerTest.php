@@ -21,7 +21,7 @@ class RandomNonceManagerTest extends TestCase
     public function testGenerateNonce()
     {
         $generatedNonce = [];
-        for ($i=0;$i<2000;$i++) {
+        for ($i=0;$i<100;$i++) {
             $nonce = $this->nonceManager->generateNonce();
             $this->assertNotContains($nonce, $generatedNonce);
             array_push($generatedNonce, $nonce);

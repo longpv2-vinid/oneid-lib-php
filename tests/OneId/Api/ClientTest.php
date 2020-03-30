@@ -192,5 +192,6 @@ class ClientTest extends TestCase
         $this->assertEquals(200, $res->getHttpStatusCode());
         $this->assertEquals(200, $res->getApiStatusCode());
         $this->assertEquals("OK", $res->getApiStatusMessage());
+        $this->assertNotEmpty($res->getData());
     }
 }
