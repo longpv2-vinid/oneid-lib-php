@@ -19,6 +19,6 @@ class OrderTest extends TestCase
 
     public function testGetQRImage()
     {
-
+        $this->assertTrue(false);
     }
 }
