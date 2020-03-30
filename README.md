@@ -1,3 +1,5 @@
+# WIP: _This is in-progress document_
+
 # Về VinID
 [VinID](https://vinid.net) là hệ sinh thái số được xây dựng với mục tiêu trở thành một trợ lý đắc lực, một người bạn đồng hành tin cậy cho tất cả mọi người, mọi gia đình và mọi hộ kinh doanh trong cuộc sống. Mỗi ngày VINID đều nỗ lực để mang đến những trải nghiệm tốt nhất và nhiều lợi ích nhất, lâu dài nhất cho người dùng. 
 
